@@ -1,4 +1,4 @@
-Backup mechanism for Postgres DB (Bash scripts)
+Backup mechanism [Postgres Databases] (Bash scripts)
 ================================================================================
 
 The README is used to introduce the tool and provide instructions on

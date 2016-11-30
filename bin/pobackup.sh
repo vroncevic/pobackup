@@ -11,15 +11,15 @@ UTIL_VERSION=ver.1.0
 UTIL=$UTIL_ROOT/sh-util-srv/$UTIL_VERSION
 UTIL_LOG=$UTIL/log
 
+. $UTIL/bin/devel.sh
+. $UTIL/bin/usage.sh
 . $UTIL/bin/checkroot.sh
 . $UTIL/bin/checktool.sh
-. $UTIL/bin/checkcfg.sh
-. $UTIL/bin/loadconf.sh
-. $UTIL/bin/loadutilconf.sh
 . $UTIL/bin/logging.sh
 . $UTIL/bin/sendmail.sh
-. $UTIL/bin/usage.sh
-. $UTIL/bin/devel.sh
+. $UTIL/bin/loadconf.sh
+. $UTIL/bin/loadutilconf.sh
+. $UTIL/bin/progressbar.sh
 
 POBACKUP_TOOL=pobackup
 POBACKUP_VERSION=ver.1.0
@@ -29,17 +29,23 @@ POBACKUP_UTIL_CFG=$POBACKUP_HOME/conf/${POBACKUP_TOOL}_util.cfg
 POBACKUP_LOG=$POBACKUP_HOME/log
 
 declare -A POBACKUP_USAGE=(
-	[TOOL_NAME]="__$POBACKUP_TOOL"
-	[ARG2]="[OPTION] help (optional)"
-	[EX-PRE]="# Postgres backup mechanism"
-	[EX]="__$POBACKUP_TOOL restart"	
+	[USAGE_TOOL]="$POBACKUP_TOOL"
+	[USAGE_ARG2]="[OPTION] help (optional)"
+	[USAGE_EX_PRE]="# Postgres backup mechanism"
+	[USAGE_EX]="$POBACKUP_TOOL restart"	
 )
 
-declare -A LOG=(
-	[TOOL]="$POBACKUP_TOOL"
-	[FLAG]="info"
-	[PATH]="$POBACKUP_LOG"
-	[MSG]=""
+declare -A POBACKUP_LOG=(
+	[LOG_TOOL]="$POBACKUP_TOOL"
+	[LOG_FLAG]="info"
+	[LOG_PATH]="$POBACKUP_LOG"
+	[LOG_MSGE]="None"
+)
+
+declare -A PB_STRUCTURE=(
+	[BAR_WIDTH]=50
+	[MAX_PERCENT]=100
+	[SLEEP]=0.01
 )
 
 TOOL_DEBUG="false"
@@ -47,118 +53,154 @@ TOOL_DEBUG="false"
 #
 # @brief   Main entry point
 # @param   Value optional help
-# @exitval Script tool pobackup exit with integer value
+# @retval  Function __pobackup exit with integer value
 #			0   - tool finished with success operation 
-# 			127 - run tool script as root user from cli
-#			128 - missing external tool pg_dump
-#			129 - missing argument(s) from cli 
-#			130 - wrong argument (operation)
+#			128 - failed to load tool script configuration from file 
+#			129 - failed to load tool script utilities configuration from file
+#			130 - missing external tool pgdump
 #
-printf "\n%s\n%s\n\n" "$POBACKUP_TOOL $POBACKUP_VERSION" "`date`"
-HELP=$1
-__checkroot
-STATUS=$?
-if [ "$STATUS" -eq "$SUCCESS" ]; then
-	declare -A configossl=()
-	__loadconf $POBACKUP_CFG cfgpobackup
-	STATUS=$?
+function __pobackup() {
+	local HELP=$1
+	if [ "$HELP" == "help" ]; then
+		__usage POBACKUP_USAGE
+	fi
+	local FUNC=${FUNCNAME[0]}
+	local MSG="Loading basic and util configuration"
+	printf "$SEND" "$POBACKUP_TOOL" "$MSG"
+	__progressbar PB_STRUCTURE
+	printf "%s\n\n" ""
+	declare -A configpobackup=()
+	__loadconf $POBACKUP_CFG configpobackup
+	local STATUS=$?
 	if [ $STATUS -eq $NOT_SUCCESS ]; then
 		MSG="Failed to load configuration [$POBACKUP_CFG]"
 		if [ "$TOOL_DBG" == "true" ]; then
 			printf "$DSTA" "$POBACKUP_TOOL" "$FUNC" "$MSG"
 		else
-			printf "$SEND" "[$POBACKUP_TOOL]" "$MSG"
+			printf "$SEND" "$POBACKUP_TOOL" "$MSG"
 		fi
 		exit 128
 	fi
-	declare -A cfgutilpobackup=()
-	__loadutilconf "$POBACKUP_UTIL_CFG" cfgutilpobackup
+	declare -A configpobackuputil=()
+	__loadutilconf "$POBACKUP_UTIL_CFG" configpobackuputil
 	STATUS=$?
 	if [ $STATUS -eq $NOT_SUCCESS ]; then
 		MSG="Failed to load utilities configuration [$POBACKUP_UTIL_CFG]"
 		if [ "$TOOL_DBG" == "true" ]; then
 			printf "$DSTA" "$POBACKUP_TOOL" "$FUNC" "$MSG"
 		else
-			printf "$SEND" "[$POBACKUP_TOOL]" "$MSG"
+			printf "$SEND" "$POBACKUP_TOOL" "$MSG"
 		fi
 		exit 129
 	fi
-    if [ "$HELP" == "help" ]; then
-        __usage $POBACKUP_USAGE
-		exit 0
-    else
-        __checktool "$cfgutilpobackup{PGDUMP}"
-        STATUS=$?
-        if [ "$STATUS" -eq "$NOT_SUCCESS" ]; then
-			MSG="Missing external tool $cfgutilpobackup{PGDUMP}"
-			if [ "${cfgpobackup[LOGGING]}" == "true" ]; then
-				LOG[MSG]=$MSG
-				LOG[FLAG]="error"
-				__logging $LOG
-			fi
-			MSG="Missing external tool ${cfgosslutil[OSSL]}"
-			if [ "${cfgpobackup[EMAILING]}" == "true" ]; then
-				__sendmail "$MSG" "${configossl[ADMIN_EMAIL]}"
-			fi
-            exit 130
-        fi
-        FILE=$cfgutilpobackup{COMPANY}.postgres.`date +"%Y%m%d"`
-        DATABASE=$cfgutilpobackup{DATABASE}
-        databases=( po_test )
-        for i in "${databases[@]}"
-        do
-            DATABASE=$i
-			CHECK_DB="psql -tAc \"$cfgutilpobackup{PG_CMD}='$DATABASE'\" > $DATABASE.rpt; exit 0"
-			su - postgres -c "$CHECK_DB"
-            RESULT=$(cat "$PGSQL/$DATABASE.rpt")
-            if [ "$RESULT" == "1" ]; then
-				SQL="$cfgutilpobackup{PGDUMP} $cfgutilpobackup{UNAME} $DATABASE > ${FILE}_${DATABASE}; exit 0"
-				su - postgres -c "$SQL"
-				mv "$cfgutilpobackup{PGSQL}/${FILE}_${DATABASE}" "$cfgutilpobackup{PGDUMP_ROOT_LOCATION}/"
-				rm "$cfgutilpobackup{PGSQL}/$DATABASE.rpt"
-				PG_BACKUP="$cfgutilpobackup{PGDUMP_ROOT_LOCATION}/${FILE}_${DATABASE}"
-                if [ -e "$PG_BACKUP" ]; then
-					gzip "$PG_BACKUP"
-					if [ "$TOOL_DEBUG" == "true" ]; then
-                    	printf "%s\n" "Backup [$PG_BACKUP.gz] was created"
-					fi
-                    ls -l "${PG_BACKUP}.gz"
-					MSG="Backup [$PG_BACKUP.gz] was created"
-					if [ "${cfgpobackup[LOGGING]}" == "true" ]; then
-						LOG[MSG]=$MSG
-						LOG[FLAG]="info"
-						__logging $LOG
-					fi
-					if [ "$TOOL_DEBUG" == "true" ]; then
-						printf "%s\n" "$MSG"
-					fi
-                fi
-				if [ "$TOOL_DEBUG" == "true" ]; then
-					printf "%s\n\n" "Check file [$PG_BACKUP]"
+    __checktool "$configpobackuputil{PGDUMP}"
+    STATUS=$?
+    if [ "$STATUS" -eq "$NOT_SUCCESS" ]; then
+		MSG="Missing external tool $configpobackuputil{PGDUMP}"
+		if [ "${configpobackup[LOGGING]}" == "true" ]; then
+			POBACKUP_LOG[LOG_MSGE]=$MSG
+			POBACKUP_LOG[LOG_FLAG]="error"
+			__logging POBACKUP_LOG
+		fi
+		MSG="Missing external tool ${configpobackuputil[PGDUMP]}"
+		if [ "${configpobackup[EMAILING]}" == "true" ]; then
+			__sendmail "$MSG" "${configpobackup[ADMIN_EMAIL]}"
+		fi
+        exit 130
+    fi
+    local FILE=$configpobackuputil{COMPANY}.postgres.`date +"%Y%m%d"`
+    local DATABASE=$configpobackuputil{DATABASE}
+    local -a databases=( po_test )
+    for i in "${databases[@]}"
+    do
+        DATABASE=$i
+		local CHECK_DB="psql -tAc \"$configpobackuputil{PG_CMD}='$DATABASE'\" > $DATABASE.rpt; exit 0"
+		su - postgres -c "$CHECK_DB"
+        local RESULT=$(cat "$PGSQL/$DATABASE.rpt")
+        if [ "$RESULT" == "1" ]; then
+			local SQL="$configpobackuputil{PGDUMP} $configpobackuputil{UNAME} $DATABASE > ${FILE}_${DATABASE}; exit 0"
+			su - postgres -c "$SQL"
+			mv "$configpobackuputil{PGSQL}/${FILE}_${DATABASE}" "$configpobackuputil{PGDUMP_ROOT_LOCATION}/"
+			rm "$configpobackuputil{PGSQL}/$DATABASE.rpt"
+			local PG_BACKUP="$configpobackuputil{PGDUMP_ROOT_LOCATION}/${FILE}_${DATABASE}"
+            if [ -e "$PG_BACKUP" ]; then
+				gzip "$PG_BACKUP"
+				MSG="Backup [$PG_BACKUP.gz] was created"
+				if [ "$TOOL_DBG" == "true" ]; then
+					printf "$DSTA" "$POBACKUP_TOOL" "$FUNC" "$MSG"
+				else
+					printf "$SEND" "$POBACKUP_TOOL" "$MSG"
 				fi
-            else
-				MSG="Database [$DATABASE] does not exist"
-				if [ "${cfgpobackup[LOGGING]}" == "true" ]; then
-					LOG[MSG]=$MSG
-					LOG[FLAG]="error"
-					__logging $LOG
+                ls -l "${PG_BACKUP}.gz"
+				MSG="Backup [$PG_BACKUP.gz] was created"
+				if [ "${configpobackup[LOGGING]}" == "true" ]; then
+					POBACKUP_LOG[LOG_MSGE]=$MSG
+					POBACKUP_LOG[LOG_FLAG]="info"
+					__logging POBACKUP_LOG
 				fi
-				if [ "$TOOL_DEBUG" == "true" ]; then
-                	printf "%s\n" "[Error] $MSG"
+				if [ "$TOOL_DBG" == "true" ]; then
+					printf "$DSTA" "$POBACKUP_TOOL" "$FUNC" "$MSG"
+				else
+					printf "$SEND" "$POBACKUP_TOOL" "$MSG"
 				fi
             fi
-        done
-		MSG="Done"
-		if [ "${cfgpobackup[LOGGING]}" == "true" ]; then
-			LOG[MSG]=$MSG
-			LOG[FLAG]="info"
-			__logging $LOG
-		fi
-		if [ "$TOOL_DEBUG" == "true" ]; then
-			printf "%s\n\n" "[$MSG]"
-		fi
-		exit 0
-    fi
+			MSG="Check file [$PG_BACKUP]"
+			if [ "${configpobackup[LOGGING]}" == "true" ]; then
+				POBACKUP_LOG[LOG_MSGE]=$MSG
+				POBACKUP_LOG[LOG_FLAG]="error"
+				__logging POBACKUP_LOG
+			fi
+			if [ "$TOOL_DBG" == "true" ]; then
+				printf "$DSTA" "$POBACKUP_TOOL" "$FUNC" "$MSG"
+			else
+				printf "$SEND" "$POBACKUP_TOOL" "$MSG"
+			fi
+        else
+			MSG="Database [$DATABASE] does not exist"
+			if [ "${configpobackup[LOGGING]}" == "true" ]; then
+				POBACKUP_LOG[LOG_MSGE]=$MSG
+				POBACKUP_LOG[LOG_FLAG]="error"
+				__logging POBACKUP_LOG
+			fi
+			if [ "${configpobackup[EMAILING]}" == "true" ]; then
+				__sendmail "$MSG" "${configpobackup[ADMIN_EMAIL]}"
+			fi
+			if [ "$TOOL_DBG" == "true" ]; then
+				printf "$DSTA" "$POBACKUP_TOOL" "$FUNC" "$MSG"
+			else
+				printf "$SEND" "$POBACKUP_TOOL" "$MSG"
+			fi
+        fi
+    done
+	MSG="Done"
+	if [ "${configpobackup[LOGGING]}" == "true" ]; then
+		POBACKUP_LOG[LOG_MSGE]=$MSG
+		POBACKUP_LOG[LOG_FLAG]="info"
+		__logging POBACKUP_LOG
+	fi
+	if [ "$TOOL_DBG" == "true" ]; then
+		printf "$DSTA" "$POBACKUP_TOOL" "$FUNC" "$MSG"
+	else
+		printf "$SEND" "$POBACKUP_TOOL" "$MSG"
+	fi
+	exit 0
+}
+
+#
+# @brief   Main entry point
+# @param   Value optional help
+# @exitval Script tool pobackup exit with integer value
+#			0   - tool finished with success operation 
+# 			127 - run tool script as root user from cli
+#			128 - failed to load tool script configuration from file 
+#			129 - failed to load tool script utilities configuration from file
+#			130 - missing external tool pgdump
+#
+printf "\n%s\n%s\n\n" "$POBACKUP_TOOL $POBACKUP_VERSION" "`date`"
+__checkroot
+STATUS=$?
+if [ $STATUS -eq $SUCCESS ]; then
+	__pobackup $1
 fi
 
 exit 127
