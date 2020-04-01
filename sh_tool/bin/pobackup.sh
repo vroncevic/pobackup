@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # @brief   Backup mechanism for Postgres databases
-# @version ver.1.0
+# @version ver.1.0.0
 # @date    Mon Apr 25 14:55:20 CEST 2016
 # @company Frobas IT Department, www.frobas.com 2016
 # @author  Vladimir Roncevic <vladimir.roncevic@frobas.com>
