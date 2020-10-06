@@ -27,11 +27,11 @@ POBACKUP_CFG=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}.cfg
 POBACKUP_UTIL_CFG=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}_util.cfg
 POBACKUP_LOG=${POBACKUP_HOME}/log
 
-declare -A POBACKUP_USAGE=(
-    [USAGE_TOOL]="${POBACKUP_TOOL}"
-    [USAGE_ARG1]="[OPTION] help (optional)"
-    [USAGE_EX_PRE]="# Postgres backup mechanism"
-    [USAGE_EX]="${POBACKUP_TOOL} help"
+declare -A POBACKUP_Usage=(
+    [Usage_TOOL]="${POBACKUP_TOOL}"
+    [Usage_ARG1]="[OPTION] help (optional)"
+    [Usage_EX_PRE]="# Postgres backup mechanism"
+    [Usage_EX]="${POBACKUP_TOOL} help"
 )
 
 declare -A POBACKUP_LOGGING=(
@@ -64,7 +64,7 @@ TOOL_NOTIFY="false"
 function __pobackup {
     local HELP=$1
     if [ "${HELP}" == "help" ]; then
-        usage POBACKUP_USAGE
+        usage POBACKUP_Usage
     fi
     local FUNC=${FUNCNAME[0]} MSG="None" STATUS_CONF STATUS_CONF_UTIL STATUS
     MSG="Loading basic and util configuration!"
