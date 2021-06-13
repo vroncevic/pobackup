@@ -41,11 +41,11 @@ To install **pobackup** type the following:
 
 .. code-block:: bash
 
-   tar xvzf pobackup-x.y.z.tar.gz
-   cd pobackup-x.y.z
-   cp -R ~/sh_tool/bin/   /root/scripts/pobackup/ver.1.0/
-   cp -R ~/sh_tool/conf/  /root/scripts/pobackup/ver.1.0/
-   cp -R ~/sh_tool/log/   /root/scripts/pobackup/ver.1.0/
+   tar xvzf pobackup-x.y.tar.gz
+   cd pobackup-x.y
+   cp -R ~/sh_tool/bin/   /root/scripts/pobackup/ver.x.y/
+   cp -R ~/sh_tool/conf/  /root/scripts/pobackup/ver.x.y/
+   cp -R ~/sh_tool/log/   /root/scripts/pobackup/ver.x.y/
 
 Or You can use Docker to create image/container.
 
@@ -70,7 +70,7 @@ Code structure:
 
 .. code-block:: bash
 
-   .
+   sh_tool/
    ├── bin/
    │   └── pobackup.sh
    ├── conf/

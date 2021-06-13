@@ -1,3 +1,5 @@
+<img align="right" src="https://raw.githubusercontent.com/vroncevic/pobackup/dev/docs/pobackup_logo.png" width="25%">
+
 # Backup mechanism Postgres DB
 
 **pobackup** is shell tool for control/operating PostgreSQL backup.
@@ -32,11 +34,11 @@ Navigate to release **[page](https://github.com/vroncevic/pobackup/releases)** d
 To install **pobackup** type the following:
 
 ```
-tar xvzf pobackup-x.y.z.tar.gz
-cd pobackup-x.y.z
-cp -R ~/sh_tool/bin/   /root/scripts/pobackup/ver.1.0/
-cp -R ~/sh_tool/conf/  /root/scripts/pobackup/ver.1.0/
-cp -R ~/sh_tool/log/   /root/scripts/pobackup/ver.1.0/
+tar xvzf pobackup-x.y.tar.gz
+cd pobackup-x.y
+cp -R ~/sh_tool/bin/   /root/scripts/pobackup/ver.x.y/
+cp -R ~/sh_tool/conf/  /root/scripts/pobackup/ver.x.y/
+cp -R ~/sh_tool/log/   /root/scripts/pobackup/ver.x.y/
 ```
 
 ![alt tag](https://raw.githubusercontent.com/vroncevic/pobackup/dev/docs/setup_tree.png)
@@ -49,7 +51,7 @@ Or You can use docker to create image/container.
 
 ```
 # Create symlink for shell tool
-ln -s /root/scripts/pobackup/ver.1.0/bin/pobackup.sh /root/bin/pobackup
+ln -s /root/scripts/pobackup/ver.x.y/bin/pobackup.sh /root/bin/pobackup
 
 # Setting PATH
 export PATH=${PATH}:/root/bin/
@@ -61,7 +63,7 @@ pobackup
 ### Dependencies
 
 **pobackup** requires next modules and libraries:
-* sh_util [https://github.com/vroncevic/sh_util](https://github.com/vroncevic/sh_util)
+* pobackup [https://github.com/vroncevic/pobackup](https://github.com/vroncevic/pobackup)
 
 ### Shell tool structure
 
@@ -69,7 +71,7 @@ pobackup
 
 Code structure:
 ```
-.
+sh_tool/
 ├── bin/
 │   └── pobackup.sh
 ├── conf/

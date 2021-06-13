@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # @brief   Backup mechanism for Postgres databases
-# @version ver.1.0.0
+# @version ver.1.0
 # @date    Mon Apr 25 14:55:20 CEST 2016
 # @company Frobas IT Department, www.frobas.com 2016
 # @author  Vladimir Roncevic <vladimir.roncevic@frobas.com>
@@ -27,7 +27,7 @@ POBACKUP_CFG=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}.cfg
 POBACKUP_UTIL_CFG=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}_util.cfg
 POBACKUP_LOG=${POBACKUP_HOME}/log
 
-declare -A POBACKUP_Usage=(
+declare -A POBACKUP_USAGE=(
     [Usage_TOOL]="${POBACKUP_TOOL}"
     [Usage_ARG1]="[OPTION] help (optional)"
     [Usage_EX_PRE]="# Postgres backup mechanism"
@@ -64,7 +64,7 @@ TOOL_NOTIFY="false"
 function __pobackup {
     local HELP=$1
     if [ "${HELP}" == "help" ]; then
-        usage POBACKUP_Usage
+        usage POBACKUP_USAGE
     fi
     local FUNC=${FUNCNAME[0]} MSG="None" STATUS_CONF STATUS_CONF_UTIL STATUS
     MSG="Loading basic and util configuration!"
