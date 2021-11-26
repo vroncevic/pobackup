@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# @brief   Backup mechanism for Postgres databases
-# @version ver.1.0
-# @date    Mon Apr 25 14:55:20 CEST 2016
-# @company Frobas IT Department, www.frobas.com 2016
-# @author  Vladimir Roncevic <vladimir.roncevic@frobas.com>
+# @brief   PostgreSQL backup manager
+# @version ver.2.0
+# @date    Fri 26 Nov 2021 07:34:17 PM CET
+# @company None, free software to use 2021
+# @author  Vladimir Roncevic <elektron.ronca@gmail.com>
 #
 UTIL_ROOT=/root/scripts
 UTIL_VERSION=ver.1.0
@@ -21,17 +21,24 @@ UTIL_LOG=${UTIL}/log
 .    ${UTIL}/bin/progress_bar.sh
 
 POBACKUP_TOOL=pobackup
-POBACKUP_VERSION=ver.1.0
+POBACKUP_VERSION=ver.2.0
 POBACKUP_HOME=${UTIL_ROOT}/${POBACKUP_TOOL}/${POBACKUP_VERSION}
 POBACKUP_CFG=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}.cfg
 POBACKUP_UTIL_CFG=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}_util.cfg
+POBACKUP_LOGO=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}.logo
 POBACKUP_LOG=${POBACKUP_HOME}/log
 
+tabs 4
+CONSOLE_WIDTH=$(stty size | awk '{print $2}')
+
+.    ${POBACKUP_HOME}/bin/center.sh
+.    ${POBACKUP_HOME}/bin/display_logo.sh
+
 declare -A POBACKUP_USAGE=(
-    [Usage_TOOL]="${POBACKUP_TOOL}"
-    [Usage_ARG1]="[OPTION] help (optional)"
-    [Usage_EX_PRE]="# Postgres backup mechanism"
-    [Usage_EX]="${POBACKUP_TOOL} help"
+    [USAGE_TOOL]="${POBACKUP_TOOL}"
+    [USAGE_ARG1]="[OPTION] help (optional)"
+    [USAGE_EX_PRE]="# Postgres backup mechanism"
+    [USAGE_EX]="${POBACKUP_TOOL} help"
 )
 
 declare -A POBACKUP_LOGGING=(
@@ -63,6 +70,7 @@ TOOL_NOTIFY="false"
 #
 function __pobackup {
     local HELP=$1
+    display_logo
     if [ "${HELP}" == "help" ]; then
         usage POBACKUP_USAGE
     fi
@@ -154,4 +162,3 @@ if [ $STATUS -eq $SUCCESS ]; then
 fi
 
 exit 127
-
