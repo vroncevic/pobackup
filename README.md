@@ -29,9 +29,11 @@ other information that should be provided before the tool is installed.
 
 ### Installation
 
+![Debian Linux OS](https://raw.githubusercontent.com/vroncevic/pobackup/dev/docs/debtux.png)
+
 Navigate to release **[page](https://github.com/vroncevic/pobackup/releases)** download and extract release archive.
 
-To install **pobackup** type the following:
+To install **pobackup** type the following
 
 ```
 tar xvzf pobackup-x.y.tar.gz
@@ -41,7 +43,34 @@ cp -R ~/sh_tool/conf/  /root/scripts/pobackup/ver.x.y/
 cp -R ~/sh_tool/log/   /root/scripts/pobackup/ver.x.y/
 ```
 
-![alt tag](https://raw.githubusercontent.com/vroncevic/pobackup/dev/docs/setup_tree.png)
+Self generated setup script and execution
+```
+./pobackup_setup.sh
+
+[setup] installing App/Tool/Script pobackup
+	Fri 26 Nov 2021 07:44:32 PM CET
+[setup] clean up App/Tool/Script structure
+[setup] copy App/Tool/Script structure
+[setup] remove github editor configuration files
+[setup] set App/Tool/Script permission
+[setup] create symbolic link of App/Tool/Script
+[setup] done
+
+/root/scripts/pobackup/ver.2.0/
+├── bin/
+│   ├── center.sh
+│   ├── display_logo.sh
+│   └── pobackup.sh
+├── conf/
+│   ├── pobackup.cfg
+│   ├── pobackup.logo
+│   └── pobackup_util.cfg
+└── log/
+    └── pobackup.log
+
+3 directories, 7 files
+lrwxrwxrwx 1 root root 46 Nov 26 19:44 /root/bin/pobackup -> /root/scripts/pobackup/ver.2.0/bin/pobackup.sh
+```
 
 Or You can use docker to create image/container.
 
@@ -57,25 +86,53 @@ ln -s /root/scripts/pobackup/ver.x.y/bin/pobackup.sh /root/bin/pobackup
 export PATH=${PATH}:/root/bin/
 
 # Control/operating PostgreSQL backup
-pobackup
+pobackup help
+
+pobackup ver.2.0
+Fri 26 Nov 2021 07:46:37 PM CET
+
+[check_root] Check permission for current session? [ok]
+[check_root] Done
+
+	                                               
+	             _                _                
+	 _ __   ___ | |__   __ _  ___| | ___   _ _ __  
+	| '_ \ / _ \| '_ \ / _` |/ __| |/ / | | | '_ \ 
+	| |_) | (_) | |_) | (_| | (__|   <| |_| | |_) |
+	| .__/ \___/|_.__/ \__,_|\___|_|\_\\__,_| .__/ 
+	|_|                                     |_|    
+	                                               
+		Info   github.io/pobackup ver.2.0 
+		Issue  github.io/issue
+		Author vroncevic.github.io
+
+  [Usage] pobackup [OPTIONS]
+  [OPTIONS]
+  [OPTION] help (optional)
+  # Postgres backup mechanism
+  pobackup help
+  [help | h] print this option
 ```
 
 ### Dependencies
 
-**pobackup** requires next modules and libraries:
+**pobackup** requires next modules and libraries
 * pobackup [https://github.com/vroncevic/pobackup](https://github.com/vroncevic/pobackup)
 
 ### Shell tool structure
 
 **pobackup** is based on MOP.
 
-Code structure:
+Shell tool structure
 ```
 sh_tool/
 ├── bin/
+│   ├── center.sh
+│   ├── display_logo.sh
 │   └── pobackup.sh
 ├── conf/
 │   ├── pobackup.cfg
+│   ├── pobackup.logo
 │   └── pobackup_util.cfg
 └── log/
     └── pobackup.log
@@ -85,7 +142,7 @@ sh_tool/
 
 [![Documentation Status](https://readthedocs.org/projects/pobackup/badge/?version=latest)](https://pobackup.readthedocs.io/projects/pobackup/en/latest/?badge=latest)
 
-More documentation and info at:
+More documentation and info at
 * [https://pobackup.readthedocs.io/en/latest/](https://pobackup.readthedocs.io/en/latest/)
 * [https://www.gnu.org/software/bash/manual/](https://www.gnu.org/software/bash/manual/)
 
