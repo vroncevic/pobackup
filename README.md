@@ -1,6 +1,6 @@
-<img align="right" src="https://raw.githubusercontent.com/vroncevic/pobackup/dev/docs/pobackup_logo.png" width="25%">
-
 # Backup mechanism Postgres DB
+
+<img align="right" src="https://raw.githubusercontent.com/vroncevic/pobackup/dev/docs/pobackup_logo.png" width="25%">
 
 **pobackup** is shell tool for control/operating PostgreSQL backup.
 
@@ -35,7 +35,7 @@ Navigate to release **[page](https://github.com/vroncevic/pobackup/releases)** d
 
 To install **pobackup** type the following
 
-```
+```bash
 tar xvzf pobackup-x.y.tar.gz
 cd pobackup-x.y
 cp -R ~/sh_tool/bin/   /root/scripts/pobackup/ver.x.y/
@@ -44,7 +44,8 @@ cp -R ~/sh_tool/log/   /root/scripts/pobackup/ver.x.y/
 ```
 
 Self generated setup script and execution
-```
+
+```bash
 ./pobackup_setup.sh
 
 [setup] installing App/Tool/Script pobackup
@@ -76,7 +77,7 @@ Or You can use docker to create image/container.
 
 ### Usage
 
-```
+```bash
 # Create symlink for shell tool
 ln -s /root/scripts/pobackup/ver.x.y/bin/pobackup.sh /root/bin/pobackup
 
@@ -126,7 +127,8 @@ Fri 26 Nov 2021 07:46:37 PM CET
 **pobackup** is based on MOP.
 
 Shell tool structure
-```
+
+```bash
 sh_tool/
 ├── bin/
 │   ├── center.sh
