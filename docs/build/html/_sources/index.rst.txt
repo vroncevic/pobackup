@@ -46,11 +46,11 @@ To install **pobackup** type the following
 
 .. code-block:: bash
 
-   tar xvzf pobackup-x.y.tar.gz
-   cd pobackup-x.y
-   cp -R ~/sh_tool/bin/   /root/scripts/pobackup/ver.x.y/
-   cp -R ~/sh_tool/conf/  /root/scripts/pobackup/ver.x.y/
-   cp -R ~/sh_tool/log/   /root/scripts/pobackup/ver.x.y/
+   tar xvzf pobackup-3.0.tar.gz
+   cd pobackup-3.0
+   cp -R ~/sh_tool/bin/   /root/scripts/pobackup/ver.3.0/
+   cp -R ~/sh_tool/conf/  /root/scripts/pobackup/ver.3.0/
+   cp -R ~/sh_tool/log/   /root/scripts/pobackup/ver.3.0/
 
 Or You can use Docker to create image/container.
 
@@ -72,8 +72,6 @@ Shell tool structure
 
    sh_tool/
    ├── bin/
-   │   ├── center.sh
-   │   ├── display_logo.sh
    │   └── pobackup.sh
    ├── conf/
    │   ├── pobackup.cfg
@@ -93,7 +91,7 @@ Copyright and licence
 .. |License: Apache 2.0| image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
    :target: https://opensource.org/licenses/Apache-2.0
 
-Copyright (C) 2016 - 2024 by `vroncevic.github.io/pobackup <https://vroncevic.github.io/pobackup>`_
+Copyright (C) 2016 - 2026 by `vroncevic.github.io/pobackup <https://vroncevic.github.io/pobackup>`_
 
 **pobackup** is free software; you can redistribute it and/or modify it
 under the same terms as Bash itself, either Bash version 4.2.47 or,

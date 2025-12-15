@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # @brief   PostgreSQL backup manager
-# @version ver.2.0
+# @version ver.3.0
 # @date    Fri 26 Nov 2021 07:34:17 PM CET
 # @company None, free software to use 2021
 # @author  Vladimir Roncevic <elektron.ronca@gmail.com>
@@ -11,28 +11,21 @@ UTIL_VERSION=ver.1.0
 UTIL=${UTIL_ROOT}/sh_util/${UTIL_VERSION}
 UTIL_LOG=${UTIL}/log
 
-.    ${UTIL}/bin/devel.sh
-.    ${UTIL}/bin/usage.sh
 .    ${UTIL}/bin/check_root.sh
 .    ${UTIL}/bin/check_tool.sh
 .    ${UTIL}/bin/logging.sh
 .    ${UTIL}/bin/load_conf.sh
 .    ${UTIL}/bin/load_util_conf.sh
 .    ${UTIL}/bin/progress_bar.sh
+.    ${UTIL}/bin/display_logo.sh
 
 POBACKUP_TOOL=pobackup
-POBACKUP_VERSION=ver.2.0
+POBACKUP_VERSION=ver.3.0
 POBACKUP_HOME=${UTIL_ROOT}/${POBACKUP_TOOL}/${POBACKUP_VERSION}
 POBACKUP_CFG=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}.cfg
 POBACKUP_UTIL_CFG=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}_util.cfg
 POBACKUP_LOGO=${POBACKUP_HOME}/conf/${POBACKUP_TOOL}.logo
 POBACKUP_LOG=${POBACKUP_HOME}/log
-
-tabs 4
-CONSOLE_WIDTH=$(stty size | awk '{print $2}')
-
-.    ${POBACKUP_HOME}/bin/center.sh
-.    ${POBACKUP_HOME}/bin/display_logo.sh
 
 declare -A POBACKUP_USAGE=(
     [USAGE_TOOL]="${POBACKUP_TOOL}"
@@ -54,6 +47,13 @@ declare -A PB_STRUCTURE=(
     [SLEEP]=0.01
 )
 
+declare -A POBACKUP_LOGO_DATA=(
+    [OWNER]="vroncevic"
+    [REPO]="${POBACKUP_TOOL}"
+    [VERSION]="${POBACKUP_VERSION}"
+    [LOGO]="${POBACKUP_LOGO}"
+)
+
 TOOL_DBG="false"
 TOOL_LOG="false"
 TOOL_NOTIFY="false"
@@ -63,17 +63,18 @@ TOOL_NOTIFY="false"
 # @param   Value optional help
 # @retval  Function __pobackup exit with integer value
 #            0   - tool finished with success operation
-#            128 - failed to load tool script configuration from files
+#            128 - failed to load tool configuration from files
 #            129 - missing external tool pgdump
 #
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #
 function __pobackup {
     local HELP=$1
-    display_logo
     if [ "${HELP}" == "help" ]; then
         usage POBACKUP_USAGE
+        exit 0
     fi
+    display_logo POBACKUP_LOGO_DATA
     local FUNC=${FUNCNAME[0]} MSG="None" STATUS_CONF STATUS_CONF_UTIL STATUS
     MSG="Loading basic and util configuration!"
     info_debug_message "$MSG" "$FUNC" "$POBACKUP_TOOL"
@@ -151,7 +152,7 @@ function __pobackup {
 # @exitval Script tool pobackup exit with integer value
 #            0   - tool finished with success operation
 #            127 - run tool script as root user from cli
-#            128 - failed to load tool script configuration from files
+#            128 - failed to load tool configuration from files
 #            129 - missing external tool pgdump
 #
 printf "\n%s\n%s\n\n" "${POBACKUP_TOOL} ${POBACKUP_VERSION}" "`date`"
